@@ -1,4 +1,3 @@
-# lib/employee.py
 from __init__ import CURSOR, CONN
 from department import Department
 
@@ -15,7 +14,7 @@ class Employee:
 
     def __repr__(self):
         return (
-            f"<Employee {self.id}: {self.name}, {self.job_title}, " +
+            f"<Employee {self.id}: {self.name}, {self.job_title}, "
             f"Department ID: {self.department_id}>"
         )
 
@@ -135,7 +134,7 @@ class Employee:
     def instance_from_db(cls, row):
         """Return an Employee object having the attribute values from the table row."""
 
-        # Check the dictionary for  existing instance using the row's primary key
+        # Check the dictionary for existing instance using the row's primary key
         employee = cls.all.get(row[0])
         if employee:
             # ensure attributes match row values in case local instance was modified
@@ -187,4 +186,10 @@ class Employee:
 
     def reviews(self):
         """Return list of reviews associated with current employee"""
-        pass
+        from review import Review  # Import Review class within the method to avoid circular imports
+
+        sql = """
+            SELECT * FROM reviews WHERE employee_id = ?
+        """
+        rows = CURSOR.execute(sql, (self.id,)).fetchall()
+        return [Review.instance_from_db(row) for row in rows]
